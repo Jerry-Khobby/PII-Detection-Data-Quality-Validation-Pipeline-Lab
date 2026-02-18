@@ -178,10 +178,6 @@ def log_results(df, completeness, dtypes, issues):
     for col, dtype in dtypes.items():
         logging.info(f"{col}: {dtype}")
 
-    logging.info("----- QUALITY ISSUES -----")
-    if not issues:
-        logging.info("No major quality issues detected.")
-        return
 
     for idx, (issue_name, df_rows) in enumerate(issues, 1):
         logging.info(f"{idx}. {issue_name} | affected rows: {len(df_rows)}")
