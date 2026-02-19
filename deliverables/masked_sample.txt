@@ -1,0 +1,29 @@
+
+# Deliverable: masked_sample.txt
+## BEFORE MASKING (first 2 rows):
+
+---
+
+```
+customer_id, first_name, last_name, email, phone, date_of_birth, address, income, account_status, created_date
+1, John, Doe, john.doe@gmail.com, 555-123-4567, 1985-03-15, 123 Main St New York NY 10001, 75000.0, active, 2024-01-10
+3, Unknown, Johnson, bob.johnson@email.com, 555-234-5678, 1988-11-08, 456 Oak Ave Los Angeles CA 90001, 0.0, suspended, 2024-01-12
+```
+
+## AFTER MASKING (first 2 rows):
+
+---
+
+```
+customer_id, first_name, last_name, email, phone, date_of_birth, address, income, account_status, created_date
+1, J***, D***, j***@gmail.com, ***-***-4567, 1985-**-**, [MASKED ADDRESS], 75000.0, active, 2024-01-10
+3, Unknown, J***, b***@email.com, ***-***-5678, 1988-**-**, [MASKED ADDRESS], 0.0, suspended, 2024-01-12
+```
+
+## ANALYSIS:
+
+* Data structure preserved: 10 rows × 10 columns
+* PII masked: Names, emails, phones, addresses, DOBs hidden
+* Business data intact: `income`, `account_status`, `created_date` preserved
+* Use case: Safe for analytics team (GDPR compliant)
+
