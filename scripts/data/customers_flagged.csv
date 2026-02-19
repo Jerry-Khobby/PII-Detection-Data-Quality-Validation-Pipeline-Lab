@@ -1,0 +1,8 @@
+row_index,customer_id,error
+1,2,"2 validation errors for Customer
+address
+  Value error, Address must be 10–200 characters [type=value_error, input_value='95000', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/value_error
+account_status
+  Input should be 'active', 'inactive' or 'suspended' [type=literal_error, input_value='2024-01-11', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/literal_error"

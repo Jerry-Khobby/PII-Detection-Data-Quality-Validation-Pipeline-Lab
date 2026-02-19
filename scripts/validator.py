@@ -65,6 +65,11 @@ class Customer(BaseModel):
 def validate_dataset(csv_path):
     df = pd.read_csv(csv_path)
     
+    df.columns = df.columns.str.strip()
+    
+    for col in df.select_dtypes(include=["object"]).columns:
+      df[col] = df[col].astype(str).str.strip()
+    
     failed_rows = []
     seen_ids = set()
     
@@ -90,12 +95,9 @@ def validate_dataset(csv_path):
         logging.error("DATA VALIDATION FAILED")
         for failure in failed_rows:
             logging.error(failure)
-        print(f"Validation failed. {len(failed_rows)} rows have errors.")
     else:
         logging.info("All rows passed validation")
-        print("Validation complete. All rows passed.")
-    
-    print("Check validation.log for details")
+
     return failed_rows
 
 

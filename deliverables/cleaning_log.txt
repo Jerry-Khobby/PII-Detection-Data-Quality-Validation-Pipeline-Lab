@@ -1,0 +1,102 @@
+# DATA CLEANING LOG
+
+====================
+
+## ACTIONS TAKEN:
+
+**Cleaning Strategy Update:**
+
+* Only `customer_id` is treated as a critical field.
+* All other missing fields are filled with safe placeholder/default values.
+* Objective: Maximize data retention while preserving primary key integrity.
+
+**Deletion Policy:**
+
+* `customer_id`: Rows missing or invalid removed.
+* Result: 0 rows deleted.
+
+**Normalization:**
+
+* Trimmed whitespace from column names and string values.
+* Converted `first_name` and `last_name` to Title Case (excluding placeholder "Unknown").
+* Standardized phone numbers to XXX-XXX-XXXX format.
+* Converted all dates to YYYY-MM-DD format.
+* Converted `customer_id` to integer.
+* Converted `income` to float.
+
+**Missing Value Handling (Filled with Placeholders):**
+
+* `first_name` → "Unknown"
+* `last_name` → "Unknown"
+* `email` → [noemail@placeholder.com](mailto:noemail@placeholder.com)
+* `phone` → 000-000-0000
+* `address` → Address Not Provided
+* `income` → 0.0
+* `account_status` → inactive
+* `date_of_birth` → 1900-01-01
+* `created_date` → Current system date
+
+**Rationale:**
+
+* `customer_id` is the only true primary key.
+* All other attributes can be updated later.
+* Improves dataset completeness and downstream usability.
+
+---
+
+
+## VALIDATION RESULTS
+
+**Before Cleaning:**
+
+* Total rows: 10
+* Passed validation: 4
+* Failed validation: 6
+* Failed row indices: 1, 3, 4, 5, 8, 9
+
+Major issues identified:
+
+* Invalid numeric income values
+* Invalid `account_status` values
+* Incorrect date formats
+* Missing required values
+* Address length violations
+
+**After Cleaning:**
+
+* Initial rows: 10
+* Deleted (missing `customer_id`): 0
+* Successfully cleaned: 9
+* Failed validation: 1
+
+**Remaining Validation Failure:**
+
+Row index: 1
+Customer ID: 2
+
+Issues:
+
+* Address too short ("95000") — fails length requirement (10–200 characters)
+* `account_status` contains invalid value ("2024-01-11")
+
+Reason: These values are structurally invalid and do not match business validation rules. They were not auto-corrected to avoid masking incorrect data.
+
+---
+
+## FINAL DATASET SUMMARY
+
+Output File: `scripts/data/customers_cleaned.csv`
+Flagged File: `scripts/data/customers_flagged.csv`
+
+* Total rows retained: 9
+* Rows flagged after cleaning: 1
+* Rows deleted: 0
+
+**Validation Improvement:**
+
+* Before cleaning: 6 failures
+* After cleaning: 1 failure
+* Overall data quality significantly improved
+
+**Final Status:** PASS WITH 1 FLAGGED RECORD
+

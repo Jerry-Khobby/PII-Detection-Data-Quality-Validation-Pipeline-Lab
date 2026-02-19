@@ -1,0 +1,110 @@
+# =========================
+# Python bytecode / cache
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+
+# =========================
+# Virtual Environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# =========================
+# PEP 582 (if used)
+# =========================
+__pypackages__/
+
+# =========================
+# Python build / packaging
+# =========================
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# =========================
+# Installer logs
+# =========================
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =========================
+# Type checkers
+# =========================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# =========================
+# Testing / Coverage
+# =========================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+*.env
+
+.venv
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# IDEs & Editors
+# =========================
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Database files
+# =========================
+*.sqlite3
+*.db
+
+# =========================
+# PyCharm
+# =========================
+*.iml
+
+# =========================
+# Docker
+# =========================
+*.pid
+*.seed
+*.pid.lock
+
+# =========================
+# Celery
+# =========================
+celerybeat-schedule

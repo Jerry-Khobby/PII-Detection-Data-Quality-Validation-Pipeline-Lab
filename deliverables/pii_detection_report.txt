@@ -1,0 +1,92 @@
+PII DETECTION REPORT
+PII Detection & Data Quality Validation Pipeline – Part 2
+---
+1. RISK CLASSIFICATION
+
+High Sensitivity Data:
+
+* First Name
+* Last Name
+* Email Address
+* Phone Number
+* Date of Birth
+* Physical Address
+
+Medium Sensitivity Data:
+
+* Income (financial attribute)
+
+---
+
+2. DATASET SUMMARY
+
+Total records analyzed: 10
+
+PII Presence Metrics:
+
+* Email addresses detected: 10 out of 10 (100%)
+* Phone numbers detected: 10 out of 10 (100%)
+* Full identity exposure (First Name + Last Name + Email): 8 out of 10 (80%)
+* Partial identity exposure (missing first or last name): 2 out of 10 (20%)
+* Physical addresses present: 9 out of 10 (90%)
+* Dates of birth present (including invalid format entries): 10 out of 10 (100%)
+
+---
+
+3. EXPOSURE RISK ANALYSIS
+
+This dataset presents a high exposure risk profile.
+
+Key Findings:
+
+1. Universal Contact Exposure
+   100% of records contain email addresses and phone numbers.
+   This enables direct phishing attacks and SMS-based social engineering.
+
+2. High Identity Linkage
+   80% of records contain full identity linkage (first name + last name + email).
+   These individuals are at elevated risk of identity misuse.
+
+3. Sensitive Attribute Combination
+   The coexistence of full name, email, phone number, date of birth, and physical address significantly increases risk severity.
+
+4. Potential Attack Scenarios
+
+   * Targeted phishing campaigns
+   * SIM swap attacks
+   * Credential reset abuse
+   * Account takeover attempts
+   * Identity spoofing and fraud
+
+Because multiple direct identifiers exist within a single table, the dataset would be classified as high impact under most data protection standards.
+
+---
+
+4. OVERALL RISK RATING
+
+HIGH RISK DATASET
+
+Justification:
+
+* 100% contact information exposure
+* 80% full identity linkage
+* Presence of multiple strong identifiers in the same record
+* No masking, encryption, or tokenization applied
+
+---
+
+5. MITIGATION RECOMMENDATIONS
+
+6. Mask email addresses before analytics usage
+   Example: [john.doe@gmail.com](mailto:john.doe@gmail.com) → j***@gmail.com
+
+7. Tokenize or partially mask phone numbers
+   Example: 555-123-4567 → 555-***-4567
+
+8. Hash or encrypt dates of birth at rest
+
+9. Remove direct identifiers from analytical datasets
+
+10. Implement Role-Based Access Control (RBAC)
+
+11. Separate PII from behavioral or financial attributes (data minimization principle)
