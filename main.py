@@ -13,9 +13,9 @@ from scripts.logging import setup_logging
 logger = logging.getLogger(__name__)
 
 # CONFIG
-INPUT_FILE = "scripts/data/customers_raw.csv"
-CLEANED_FILE = "scripts/data/customers_cleaned.csv"
-MASKED_FILE = "scripts/data/customers_masked.csv"
+INPUT_FILE = "data/customers_raw.csv"
+CLEANED_FILE = "data/customers_cleaned.csv"
+MASKED_FILE = "data/customers_masked.csv"
 
 BASE_OUTPUT_DIR = "deliverables/main"
 
