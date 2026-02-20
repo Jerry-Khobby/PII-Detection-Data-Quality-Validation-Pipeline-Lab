@@ -1,0 +1,41 @@
+PIPELINE EXECUTION REPORT
+=========================
+Timestamp: 2026-02-20 09:59:05
+
+Stage 1: LOAD
+✓ Loaded customers_raw.csv
+- 10 rows, 10 columns
+
+Stage 2: CLEAN
+- Initial rows: 10
+- Deleted rows (missing customer_id): 0
+- Successfully cleaned: 9
+- Failed after cleaning: 1
+
+Stage 3: VALIDATE
+- Total rows checked: 9
+- Passed rows: 9
+- Failed rows: 0
+- Status: PASS
+
+Stage 4: DETECT PII
+- Emails Found: 9
+- Phones Found: 9
+- Full Identity Found: 9
+- Addresses Found: 9
+- Dob Found: 9
+
+Stage 5: MASK
+- Rows processed: 9
+- Rows masked: 9
+
+Stage 6: SAVE
+✓ Saved customers_masked.csv
+
+SUMMARY:
+- Input rows: 10
+- Output rows: 9
+- Validation: PASS
+- PII Records Found: 45
+- PII Risk: CHECK REQUIRED
+Status: SUCCESS ✓

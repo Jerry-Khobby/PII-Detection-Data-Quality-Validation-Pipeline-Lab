@@ -197,30 +197,4 @@ def compare_datasets(original_path, masked_path, num_samples=5):
         print(f"Error comparing datasets: {e}")
 
 
-if __name__ == "__main__":
-    input_file = "scripts/data/customers_cleaned.csv"
-    output_file = "scripts/data/customers_masked.csv"
-    
-    print("\n" + "="*80)
-    print("PII MASKING PROCESS")
-    print("="*80 + "\n")
-    
-    # Apply masking
-    result = mask_dataset(input_file, output_file)
-    
-    print(f"Masking complete:")
-    print(f"  Total rows: {result['total_rows']}")
-    print(f"  Masked rows: {result['masked_rows']}")
-    print(f"  Output saved to: {output_file}")
-    print(f"  Log saved to: logs/masking.log")
-    
-    # Compare before and after
-    compare_datasets(input_file, output_file, num_samples=5)
-    
-    print("\nMasking rules applied:")
-    print("  • Names:     'John Doe' → 'J*** D***'")
-    print("  • Emails:    'john.doe@gmail.com' → 'j***@gmail.com'")
-    print("  • Phones:    '555-123-4567' → '***-***-4567'")
-    print("  • Addresses: '123 Main St' → '[MASKED ADDRESS]'")
-    print("  • DOB:       '1985-03-15' → '1985-**-**'")
-    print()
+

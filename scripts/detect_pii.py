@@ -18,14 +18,20 @@ logging.basicConfig(
 
 def detect_pii(df):
     results = {}
+    summary = {}
 
     if "email" in df.columns:
         email_mask = df["email"].astype(str).str.match(EMAIL_REGEX, na=False)
-        results["emails"] = df[email_mask].copy()
+        emails_df = df[email_mask].copy()
+        results["emails"] = emails_df
+        summary["emails_found"] = len(emails_df)
 
     if "phone" in df.columns:
         phone_mask = df["phone"].astype(str).str.match(PHONE_REGEX, na=False)
-        results["phones"] = df[phone_mask].copy()
+        phones_df = df[phone_mask].copy()
+        results["phones"] = phones_df
+        summary["phones_found"] = len(phones_df)
+
 
     if {"first_name", "last_name", "email"}.issubset(df.columns):
         identity_mask = (
@@ -33,19 +39,28 @@ def detect_pii(df):
             df["last_name"].notna() &
             df["email"].astype(str).str.match(EMAIL_REGEX, na=False)
         )
-        results["full_identity"] = df[identity_mask].copy()
+        identity_df = df[identity_mask].copy()
+        results["full_identity"] = identity_df
+        summary["full_identity_found"] = len(identity_df)
+
 
     if "address" in df.columns:
-        results["addresses"] = df[df["address"].notna()].copy()
+        address_df = df[df["address"].notna()].copy()
+        results["addresses"] = address_df
+        summary["addresses_found"] = len(address_df)
+
 
     if "date_of_birth" in df.columns:
-        results["dob"] = df[df["date_of_birth"].notna()].copy()
+        dob_df = df[df["date_of_birth"].notna()].copy()
+        results["dob"] = dob_df
+        summary["dob_found"] = len(dob_df)
 
-    return results
+    return {
+       "details":results,
+       "summary":summary,
+   }
 
 
 
 
-df = pd.read_csv("../scripts/customers_raw.csv")
-df.columns = df.columns.str.strip()
-print(detect_pii(df))
+

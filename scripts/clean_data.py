@@ -5,6 +5,7 @@ from scripts.validator import Customer
 from pydantic import ValidationError
 import logging 
 import os 
+from scripts.logging import setup_logging
 
 # Create logs directory BEFORE configuring logging
 os.makedirs("logs", exist_ok=True)
@@ -245,23 +246,4 @@ def clean_dataset(input_path, output_path):
     }
 
 
-if __name__ == "__main__":
-    input_file = "scripts/customers_raw.csv"
-    output_file = "scripts/data/customers_cleaned.csv"
-    flagged_file = "scripts/data/customers_flagged.csv"
-    
-    result = clean_dataset(input_file, output_file)
-    
-    print(f"\nCleaning Summary:")
-    print(f"  Initial rows: {result['initial_count']}")
-    print(f"  Deleted (missing customer_id): {result['deleted_count']}")
-    print(f"  Successfully cleaned: {result['cleaned_count']}")
-    print(f"  Failed validation: {result['flagged_count']}")
-    print(f"\nCleaned data saved to: {output_file}")
-    
-    if result['flagged_count'] > 0:
-        flagged_df = pd.DataFrame(result['flagged_rows'])
-        flagged_df.to_csv(flagged_file, index=False)
-        print(f"Rows that failed validation saved to: {flagged_file}")
-    
-    print(f"\nCheck logs/cleaning.log for details")
+

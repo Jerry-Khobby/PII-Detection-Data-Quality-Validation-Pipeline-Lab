@@ -64,48 +64,60 @@ class Customer(BaseModel):
 # Validation logic
 def validate_dataset(csv_path):
     df = pd.read_csv(csv_path)
-    
+
     df.columns = df.columns.str.strip()
-    
     for col in df.select_dtypes(include=["object"]).columns:
-      df[col] = df[col].astype(str).str.strip()
-    
+        df[col] = df[col].astype(str).str.strip()
+
     failed_rows = []
+    failures_by_column = {}
     seen_ids = set()
-    
+
     for index, row in df.iterrows():
+        row_dict = row.to_dict()
+
         try:
-            # Check uniqueness
-            if row["customer_id"] in seen_ids:
+            # Uniqueness check
+            if row_dict["customer_id"] in seen_ids:
                 raise ValueError("Duplicate customer_id")
-            seen_ids.add(row["customer_id"])
-            
-            # Validate row
-            Customer(**row.to_dict())
-            
+            seen_ids.add(row_dict["customer_id"])
+
+            Customer(**row_dict)
+
         except (ValidationError, ValueError) as e:
-            failed_rows.append({
+
+            error_str = str(e)
+
+            # Extract column name from error message
+            column_name = "unknown"
+            if hasattr(e, "errors"):
+                try:
+                    column_name = e.errors()[0]["loc"][0]
+                except:
+                    pass
+
+            failure_record = {
                 "row_index": index,
-                "customer_id": row.get("customer_id"),
-                "error": str(e)
-            })
-    
-    # Log results
-    if failed_rows:
-        logging.error("DATA VALIDATION FAILED")
-        for failure in failed_rows:
-            logging.error(failure)
-    else:
-        logging.info("All rows passed validation")
+                "customer_id": row_dict.get("customer_id"),
+                "column": column_name,
+                "error": error_str
+            }
 
-    return failed_rows
+            failed_rows.append(failure_record)
 
+            # Group by column
+            if column_name not in failures_by_column:
+                failures_by_column[column_name] = []
+            failures_by_column[column_name].append(failure_record)
+
+    return {
+        "total_rows": len(df),
+        "passed_count": len(df) - len(failed_rows),
+        "failed_count": len(failed_rows),
+        "failed_rows": failed_rows,
+        "failures_by_column": failures_by_column,
+        "passed": len(failed_rows) == 0
+    }
 
 # run validation
-if __name__ == "__main__":
-    failed = validate_dataset("./customers_raw.csv")
-    
-    if failed:
-        print("\nFailed rows summary:")
-        for f in failed:
-            print(f"Row {f['row_index']} (ID: {f['customer_id']}): {f['error']}")
+

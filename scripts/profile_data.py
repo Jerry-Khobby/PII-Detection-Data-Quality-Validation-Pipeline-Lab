@@ -158,6 +158,15 @@ def profile_data(csv_path):
     issues.extend(validate_date_column(df, "created_date"))
 
     log_results(df, completeness, dtypes, issues)
+    
+    return {
+        "total_rows": len(df),
+        "total_columns": len(df.columns),
+        "completeness": completeness,
+        "data_types": dtypes,
+        "issues_found": len(issues),
+        "issues": issues
+    }
 
 
 def log_results(df, completeness, dtypes, issues):
@@ -185,6 +194,4 @@ def log_results(df, completeness, dtypes, issues):
             logging.info(df_rows.to_string(index=True))
 
 
-if __name__ == "__main__":
-    profile_data("./customers_raw.csv")
-    print(f"Data quality log written to {LOG_FILE}")
+
