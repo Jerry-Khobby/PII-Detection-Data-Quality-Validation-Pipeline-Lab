@@ -1,17 +1,9 @@
 import pandas as pd
 import logging
-from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 VALID_ACCOUNT_STATUS = {"active", "inactive", "suspended"}
-LOG_FILE = "../logs/data_quality_check.log"
-Path(LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
-
-logging.basicConfig(
-    filename=LOG_FILE,
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
 
 
 def completeness_report(df):
@@ -140,6 +132,8 @@ def validate_date_column(df, column):
 
 
 def profile_data(csv_path):
+    logger.info(f"Starting data profiling: {csv_path}")
+    
     df = pd.read_csv(csv_path)
     completeness = completeness_report(df)
     dtypes = detect_data_types(df)
@@ -159,6 +153,8 @@ def profile_data(csv_path):
 
     log_results(df, completeness, dtypes, issues)
     
+    logger.info(f"Data profiling complete. Found {len(issues)} issues")
+    
     return {
         "total_rows": len(df),
         "total_columns": len(df.columns),
@@ -170,28 +166,25 @@ def profile_data(csv_path):
 
 
 def log_results(df, completeness, dtypes, issues):
-    logging.info("===== DATA QUALITY PROFILE =====")
-    logging.info(f"Total rows: {len(df)} | Total columns: {len(df.columns)}")
+    logger.info("===== DATA QUALITY PROFILE =====")
+    logger.info(f"Total rows: {len(df)} | Total columns: {len(df.columns)}")
 
-    logging.info("----- COMPLETENESS -----")
+    logger.info("----- COMPLETENESS -----")
     for col, stats in completeness.items():
         if stats["missing_count"] > 0:
-            logging.info(
+            logger.info(
                 f"{col}: {stats['percent_complete']}% complete | "
                 f"{stats['missing_count']} missing | row indices: {stats['missing_rows']}"
             )
         else:
-            logging.info(f"{col}: 100% complete")
+            logger.info(f"{col}: 100% complete")
 
-    logging.info("----- DATA TYPES -----")
+    logger.info("----- DATA TYPES -----")
     for col, dtype in dtypes.items():
-        logging.info(f"{col}: {dtype}")
+        logger.info(f"{col}: {dtype}")
 
-
+    logger.info("----- ISSUES FOUND -----")
     for idx, (issue_name, df_rows) in enumerate(issues, 1):
-        logging.info(f"{idx}. {issue_name} | affected rows: {len(df_rows)}")
+        logger.info(f"{idx}. {issue_name} | affected rows: {len(df_rows)}")
         if not df_rows.empty:
-            logging.info(df_rows.to_string(index=True))
-
-
-
+            logger.debug(df_rows.to_string(index=True))

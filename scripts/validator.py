@@ -5,15 +5,9 @@ import pandas as pd
 import re
 import logging
 
-# Configure logging
-logging.basicConfig(
-    filename="../logs/validation.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logger = logging.getLogger(__name__)
 
 
-# Schema Model
 class Customer(BaseModel):
     customer_id: int
     first_name: str
@@ -61,8 +55,9 @@ class Customer(BaseModel):
         return v
 
 
-# Validation logic
 def validate_dataset(csv_path):
+    logger.info(f"Starting dataset validation: {csv_path}")
+    
     df = pd.read_csv(csv_path)
 
     df.columns = df.columns.str.strip()
@@ -77,7 +72,6 @@ def validate_dataset(csv_path):
         row_dict = row.to_dict()
 
         try:
-            # Uniqueness check
             if row_dict["customer_id"] in seen_ids:
                 raise ValueError("Duplicate customer_id")
             seen_ids.add(row_dict["customer_id"])
@@ -85,10 +79,8 @@ def validate_dataset(csv_path):
             Customer(**row_dict)
 
         except (ValidationError, ValueError) as e:
-
             error_str = str(e)
 
-            # Extract column name from error message
             column_name = "unknown"
             if hasattr(e, "errors"):
                 try:
@@ -105,19 +97,20 @@ def validate_dataset(csv_path):
 
             failed_rows.append(failure_record)
 
-            # Group by column
             if column_name not in failures_by_column:
                 failures_by_column[column_name] = []
             failures_by_column[column_name].append(failure_record)
+            
+            logger.warning(f"Row {index} validation failed: {error_str}")
+
+    passed_count = len(df) - len(failed_rows)
+    logger.info(f"Validation complete: {passed_count}/{len(df)} rows passed")
 
     return {
         "total_rows": len(df),
-        "passed_count": len(df) - len(failed_rows),
+        "passed_count": passed_count,
         "failed_count": len(failed_rows),
         "failed_rows": failed_rows,
         "failures_by_column": failures_by_column,
         "passed": len(failed_rows) == 0
     }
-
-# run validation
-

@@ -4,14 +4,9 @@ import logging
 import os
 
 # Create logs directory
-os.makedirs("logs", exist_ok=True)
 
-logging.basicConfig(
-    filename="logs/masking.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
 
+logger = logging.getLogger(__name__)
 
 def mask_name(name):
     """
@@ -98,53 +93,53 @@ def mask_dataset(input_path, output_path):
     """
     Apply PII masking to cleaned dataset
     """
-    logging.info(f"Starting PII masking: {input_path}")
+    logger.info(f"Starting PII masking: {input_path}")
     
     try:
         df = pd.read_csv(input_path)
-        logging.info(f"Loaded {len(df)} rows from {input_path}")
+        logger.info(f"Loaded {len(df)} rows from {input_path}")
     except FileNotFoundError:
-        logging.error(f"Input file not found: {input_path}")
+        logger.error(f"Input file not found: {input_path}")
         raise
     except Exception as e:
-        logging.error(f"Failed to read input file: {e}")
+        logger.error(f"Failed to read input file: {e}")
         raise
     
     initial_count = len(df)
     
     # Apply masking functions
-    logging.info("Applying masking to first_name")
+    logger.info("Applying masking to first_name")
     df["first_name"] = df["first_name"].apply(mask_name)
     
-    logging.info("Applying masking to last_name")
+    logger.info("Applying masking to last_name")
     df["last_name"] = df["last_name"].apply(mask_name)
     
-    logging.info("Applying masking to email")
+    logger.info("Applying masking to email")
     df["email"] = df["email"].apply(mask_email)
     
-    logging.info("Applying masking to phone")
+    logger.info("Applying masking to phone")
     df["phone"] = df["phone"].apply(mask_phone)
     
-    logging.info("Applying masking to address")
+    logger.info("Applying masking to address")
     df["address"] = df["address"].apply(mask_address)
     
-    logging.info("Applying masking to date_of_birth")
+    logger.info("Applying masking to date_of_birth")
     df["date_of_birth"] = df["date_of_birth"].apply(mask_dob)
     
     # Create output directory if needed
     output_dir = os.path.dirname(output_path)
     if output_dir and not os.path.exists(output_dir):
         os.makedirs(output_dir)
-        logging.info(f"Created output directory: {output_dir}")
+        logger.info(f"Created output directory: {output_dir}")
     
     try:
         df.to_csv(output_path, index=False)
-        logging.info(f"Saved {len(df)} masked rows to {output_path}")
+        logger.info(f"Saved {len(df)} masked rows to {output_path}")
     except Exception as e:
-        logging.error(f"Failed to write output file: {e}")
+        logger.error(f"Failed to write output file: {e}")
         raise
     
-    logging.info("PII masking complete")
+    logger.info("PII masking complete")
     
     return {
         "total_rows": initial_count,
@@ -193,7 +188,7 @@ def compare_datasets(original_path, masked_path, num_samples=5):
         print()
         
     except Exception as e:
-        logging.error(f"Failed to compare datasets: {e}")
+        logger.error(f"Failed to compare datasets: {e}")
         print(f"Error comparing datasets: {e}")
 
 

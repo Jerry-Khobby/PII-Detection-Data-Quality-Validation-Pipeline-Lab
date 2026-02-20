@@ -10,10 +10,7 @@ from scripts.detect_pii import detect_pii
 from scripts.mask_pii import mask_dataset
 from scripts.logging import setup_logging
 
-
-
-
-
+logger = logging.getLogger(__name__)
 
 # CONFIG
 INPUT_FILE = "scripts/data/customers_raw.csv"
@@ -31,13 +28,6 @@ PIPELINE_REPORT = f"{BASE_OUTPUT_DIR}/pipeline_execution_report.txt"
 
 os.makedirs(BASE_OUTPUT_DIR, exist_ok=True)
 os.makedirs("logs", exist_ok=True)
-
-logging.basicConfig(
-    filename="logs/pipeline.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
 
 
 # HELPER: PRETTY FORMATTER
@@ -57,19 +47,26 @@ def write_txt(path, lines):
         f.write("\n".join(lines))
 
 
-
 # PIPELINE
 def run_pipeline():
-
+    # Setup centralized logging first
+    setup_logging()
+    
+    logger.info("Starting data quality pipeline")
+    
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     try:
-
-        # ===================================================
         # STAGE 1: LOAD
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 1: LOAD")
+        logger.info("="*80)
+        
         df_raw = pd.read_csv(INPUT_FILE)
         input_rows, input_cols = df_raw.shape
+        
+        logger.info(f"Loaded {os.path.basename(INPUT_FILE)}")
+        logger.info(f"Rows: {input_rows}, Columns: {input_cols}")
 
         stage1_lines = [
             "Stage 1: LOAD",
@@ -78,9 +75,11 @@ def run_pipeline():
             ""
         ]
 
-        # ===================================================
         # STAGE 2: CLEAN
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 2: CLEAN")
+        logger.info("="*80)
+        
         cleaning_result = clean_dataset(INPUT_FILE, CLEANED_FILE)
 
         stage2_lines = [
@@ -92,9 +91,11 @@ def run_pipeline():
             ""
         ]
 
-        # ===================================================
         # STAGE 3: VALIDATE
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 3: VALIDATE")
+        logger.info("="*80)
+        
         validation_result = validate_dataset(CLEANED_FILE)
 
         validation_status = "PASS" if validation_result["passed"] else "FAIL"
@@ -111,12 +112,16 @@ def run_pipeline():
         # Stop pipeline if validation fails
         if not validation_result["passed"]:
             overall_status = "FAILED"
+            logger.error("Validation failed. Stopping pipeline.")
         else:
             overall_status = "SUCCESS"
+            logger.info("Validation passed. Continuing pipeline.")
 
-        # ===================================================
         # STAGE 4: DETECT PII
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 4: DETECT PII")
+        logger.info("="*80)
+        
         df_cleaned = pd.read_csv(CLEANED_FILE)
         pii_result = detect_pii(df_cleaned)
         pii_summary = pii_result["summary"]
@@ -132,9 +137,11 @@ def run_pipeline():
 
         stage4_lines.append("")
 
-        # ===================================================
         # STAGE 5: MASK
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 5: MASK")
+        logger.info("="*80)
+        
         mask_result = mask_dataset(CLEANED_FILE, MASKED_FILE)
 
         stage5_lines = [
@@ -144,20 +151,21 @@ def run_pipeline():
             ""
         ]
 
-        # ===================================================
         # STAGE 6: SAVE
-        # ===================================================
+        logger.info("="*80)
+        logger.info("STAGE 6: SAVE")
+        logger.info("="*80)
+        
+        logger.info(f"Saved masked dataset to {os.path.basename(MASKED_FILE)}")
+        
         stage6_lines = [
             "Stage 6: SAVE",
             f"✓ Saved {os.path.basename(MASKED_FILE)}",
             ""
         ]
 
-        # ===================================================
-        # FINAL SUMMARY (BUILT FROM REAL RESULTS)
-        # ===================================================
+        # FINAL SUMMARY
         output_rows = mask_result["masked_rows"]
-
         pii_risk = "MITIGATED" if output_rows == input_rows else "CHECK REQUIRED"
 
         final_report = [
@@ -167,7 +175,6 @@ def run_pipeline():
             "",
         ]
 
-        # Append stages sequentially
         final_report.extend(stage1_lines)
         final_report.extend(stage2_lines)
         final_report.extend(stage3_lines)
@@ -187,11 +194,21 @@ def run_pipeline():
 
         write_txt(PIPELINE_REPORT, final_report)
 
+        logger.info("="*80)
+        logger.info(f"Pipeline completed with status: {overall_status}")
+        logger.info(f"Pipeline execution report saved to: {PIPELINE_REPORT}")
+        logger.info(f"Centralized log saved to: logs/pipeline.log")
+        logger.info("="*80)
+
+        print("\n" + "="*80)
         print("Pipeline completed successfully.")
+        print(f"Status: {overall_status}")
+        print(f"Check logs/pipeline.log for detailed execution log")
+        print(f"Check {PIPELINE_REPORT} for summary report")
+        print("="*80 + "\n")
 
     except Exception as e:
-
-        logging.exception("Pipeline crashed")
+        logger.exception("Pipeline crashed with exception")
 
         write_txt(PIPELINE_REPORT, [
             "PIPELINE EXECUTION REPORT",
@@ -199,12 +216,17 @@ def run_pipeline():
             f"Timestamp: {timestamp}",
             "",
             "Status: FAILED ✗",
-            f"Error: {str(e)}"
+            f"Error: {str(e)}",
+            "",
+            "Check logs/pipeline.log for detailed error trace"
         ])
 
-        print("Pipeline failed. Check logs.")
-        
-        
+        print("\n" + "="*80)
+        print("Pipeline failed. Check logs for details.")
+        print(f"Error: {str(e)}")
+        print(f"Detailed log: logs/pipeline.log")
+        print("="*80 + "\n")
+
 
 if __name__ == "__main__":
     run_pipeline()
